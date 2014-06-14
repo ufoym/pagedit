@@ -42,7 +42,7 @@ def get_template(name, content = 'Write something here...'):
     </body>
     </html>'''])
 
-@app.route("/<name>", methods=['GET', 'POST'])
+@app.route("/<path:name>", methods=['GET', 'POST'])
 def page(name):
     fn = os.path.join(content_path, name + '.txt')
     template = ''
@@ -54,6 +54,11 @@ def page(name):
             template = get_template(name)
     else:
         content = request.form['content'].encode(charset)
+        name_terms = name.split('/')
+        if len(name_terms) > 1:
+            folder = '/'.join([content_path] + name_terms[:-1])
+            if not os.path.exists(folder):
+                os.makedirs(folder)
         with open(fn, 'w') as f:
             f.write(content)
         template = get_template(name, content)
