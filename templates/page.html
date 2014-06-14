@@ -1,27 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
-<script type="text/javascript">
-tinymce.init({
-    selector: "div.editable",
-    inline: true,
-    plugins: [
-        "autoresize",
-        "advlist autolink lists link image charmap print preview anchor",
-        "searchreplace visualblocks code fullscreen",
-        "insertdatetime media table contextmenu paste"
-    ],
-    toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
-});
-</script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style type="text/css">
+        body {font-family: Georgia, serif;}
+        .action {
+            position: absolute;
+            display: none;
+            background: #ccc;
+            top: 0;
+            left: 50%;
+            padding: 10px;
+        }
+        .editable {padding: 10px;}
+    </style>
 </head>
 <body>
-<form id="main-form" method="post" action="/{{ name }}">
-    <div id="content" class="editable" onblur="document.getElementById('main-form').submit()">
-    {{ content|safe }}
-    </div>
-</form>
+    <div class='action'>Saved!</div>
+    <div class="editable" onblur="update()"> {{ content|safe }}</div>
+
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+    <script type="text/javascript">
+    tinymce.init({
+        selector: "div.editable",
+        inline: true
+    });
+    function update(){
+        $.ajax({
+            type:"POST",
+            url:"/{{ name }}",
+            data:"content="+encodeURIComponent($(".editable").html()),
+            success:function(){$('.action').fadeIn(750).delay(3000).fadeOut(750)}
+        });
+        return false;
+    };
+    </script>
 </body>
 </html>
