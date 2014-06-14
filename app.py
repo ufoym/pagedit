@@ -9,26 +9,19 @@ content_path = 'content'
 if not os.path.exists(content_path):
     os.mkdir(content_path)
 
-def get_template(name, content = '内容'):
+def get_template(name, content = 'Write something here...'):
     return ''.join(['''
-
     <!DOCTYPE html>
     <html>
     <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <script type="text/javascript" src="http://tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+    <script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
     <script type="text/javascript">
-    tinymce.init({
-        selector: "h1.editable",
-        inline: true,
-        toolbar: "undo redo",
-        menubar: false
-    });
-
     tinymce.init({
         selector: "div.editable",
         inline: true,
         plugins: [
+            "autoresize",
             "advlist autolink lists link image charmap print preview anchor",
             "searchreplace visualblocks code fullscreen",
             "insertdatetime media table contextmenu paste"
@@ -38,14 +31,13 @@ def get_template(name, content = '内容'):
     </script>
     </head>
     <body>
-    <form method="post" action="/''',
+    <form id="main-form" method="post" action="/''',
     name,
     '''">
-    <div id="content" class="editable" style="width:100%; height:250px">''',
+    <div id="content" class="editable" onblur="document.getElementById('main-form').submit()">''',
     content.decode(charset),
     '''
     </div>
-    <input type="submit" name="save" value="Submit" />
     </form>
     </body>
     </html>'''])
