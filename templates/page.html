@@ -24,15 +24,19 @@
     <script type="text/javascript">
     tinymce.init({
         selector: "div.editable",
-        inline: true
+        inline: true,
+        plugins: ["link image table"]
     });
     function update(){
-        $.ajax({
-            type:"POST",
-            url:"/{{ name }}",
-            data:"content="+encodeURIComponent($(".editable").html()),
-            success:function(){$('.action').fadeIn(750).delay(3000).fadeOut(750)}
-        });
+        if (tinymce.activeEditor.isDirty()) {
+            $.ajax({
+                type:"POST",
+                url:"/{{ name }}",
+                data:"content="+encodeURIComponent($(".editable").html()),
+                success:function(){$('.action').fadeIn(750).delay(3000).fadeOut(750)}
+            });
+            tinymce.activeEditor.save();
+        }
         return false;
     };
     </script>
