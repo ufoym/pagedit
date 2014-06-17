@@ -25,7 +25,21 @@
     tinymce.init({
         selector: "div.editable",
         inline: true,
-        plugins: ["link image table"]
+        plugins: ["link image table"],
+            image_advtab: true,
+
+            file_browser_callback: function(field_name, url, type, win) {
+                tinymce.activeEditor.windowManager.open({
+                    file : '/uploads',
+                    title : 'browse files',
+                    width : 500,
+                    height : 320
+                },{
+                    window : win,
+                    input : field_name
+                });
+                return false;
+            }
     });
     function update(){
         if (tinymce.activeEditor.isDirty()) {
