@@ -1,58 +1,23 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <style type="text/css">
-        body {font-family: Georgia, serif;}
-        .action {
-            position: absolute;
-            display: none;
-            background: #ccc;
-            top: 0;
-            left: 50%;
-            padding: 10px;
-        }
-        .editable {padding: 10px;}
-    </style>
-</head>
-<body>
-    <div class='action'>Saved!</div>
-    <div class="editable" onblur="update()"> {{ content|safe }}</div>
-
-    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
-    <script type="text/javascript">
-    tinymce.init({
-        selector: "div.editable",
-        inline: true,
-        plugins: ["link image table"],
-            image_advtab: true,
-
-            file_browser_callback: function(field_name, url, type, win) {
-                tinymce.activeEditor.windowManager.open({
-                    file : '/uploads',
-                    title : 'browse files',
-                    width : 500,
-                    height : 320
-                },{
-                    window : win,
-                    input : field_name
-                });
-                return false;
-            }
-    });
-    function update(){
-        if (tinymce.activeEditor.isDirty()) {
-            $.ajax({
-                type:"POST",
-                url:"/{{ name }}",
-                data:"content="+encodeURIComponent($(".editable").html()),
-                success:function(){$('.action').fadeIn(750).delay(3000).fadeOut(750)}
+    <head>
+        <title>A Simple Page</title>
+        <script src="//cdn.ckeditor.com/4.4.1/standard/ckeditor.js"></script>
+    </head>
+    <body>
+        <form>
+            <textarea name="editor" id="editor" rows="10" cols="80">
+                This is my textarea to be replaced with CKEditor.
+            </textarea>
+        </form>
+        <script type="text/javascript">
+            CKEDITOR.plugins.addExternal('imagebrowser',
+                '/static/imagebrowser/', 'plugin.js');
+            CKEDITOR.replace('editor', {
+                extraPlugins: 'imagebrowser',
+                imageBrowser_listUrl: '/_/upload',
+                filebrowserUploadUrl: '/_/upload'
             });
-            tinymce.activeEditor.save();
-        }
-        return false;
-    };
-    </script>
-</body>
+        </script>
+    </body>
 </html>
