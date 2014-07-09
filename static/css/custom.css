@@ -10,10 +10,11 @@ h1.brand {
 }
 
 .content-view {
-    padding: 8px;
+    padding: 12px;
     min-height: 100px;
 }
 
 .content-view-hover {
     border: 2px dotted #ccc;
+    padding: 10px;
 }
