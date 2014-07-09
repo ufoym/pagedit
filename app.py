@@ -32,12 +32,15 @@ db = SQLAlchemy(app)
 
 # ----------------------------------------------------------------------------
 
+def clean_url(url):
+    return '/%s' % url.strip('/')
+
 class Page(db.Model):
     url = db.Column(db.String, primary_key=True)
     content = db.Column(db.String)
 
     def __init__(self, url, content):
-        self.url = '/%s' % url.strip('/')
+        self.url = clean_url(url)
         self.content = content
 
 # ----------------------------------------------------------------------------
@@ -94,8 +97,9 @@ def uploaded_file(filename):
 
 @app.route('/_/contents/save', methods=['POST'])
 def save_content():
+    url = clean_url(request.args.get('url', ''))
     content = request.form['content']
-    page = Page('/', content)
+    page = Page(url, content)
     db.session.merge(page)
     db.session.commit()
     return jsonify({'msg': 'ok', 'url': page.url, 'content': page.content})
@@ -103,8 +107,12 @@ def save_content():
 # ----------------------------------------------------------------------------
 
 @app.route('/')
-def entry():
-    page = Page.query.filter(Page.url == '/').first()
+@app.route('/<path:url>')
+def entry(url = ''):
+    url = clean_url(url)
+    page = Page.query.filter(Page.url == url).first()
+    if page is None:
+        page = Page(url, '')
     return render_template('app.html', page=page)
 
 # ----------------------------------------------------------------------------
