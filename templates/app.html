@@ -10,7 +10,7 @@
 <body>
     <div id="page">
     <h1>Pagedit</h1>
-    <textarea id="content" name="content"></textarea>
+    <textarea id="content" name="content">{{page.content}}</textarea>
     </div>
     <script type="text/javascript" src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/redactor.min.js')}}"></script>
@@ -23,6 +23,7 @@
                 plugins: ['save'],
                 placeholder: 'Add content...',
                 toolbarFixed: true,
+                minHeight: 100,
                 clipboardUploadUrl: '/_/images/paste',
                 imageUpload: '/_/images/add',
                 fileUpload: '/_/files/add',

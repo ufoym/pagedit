@@ -10,19 +10,35 @@ from flask import (
     jsonify,
     send_from_directory
 )
+from flask.ext.sqlalchemy import SQLAlchemy
 
 # ----------------------------------------------------------------------------
 
+DATABASE_PATH = os.path.join('var', 'contents.db')
 UPLOAD_FOLDER = os.path.join('var', 'uploads')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf',
                           'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
                           'png', 'jpg', 'jpeg', 'gif'])
 CONTENT_TYPE_TO_EXT = {'image/gif':'gif','image/jpeg':'jpg','image/png':'png'}
+BASE_FOLDER = os.path.abspath(os.path.dirname(__file__))
 
 # ----------------------------------------------------------------------------
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s/%s' \
+                                      % (BASE_FOLDER, DATABASE_PATH)
+db = SQLAlchemy(app)
+
+# ----------------------------------------------------------------------------
+
+class Page(db.Model):
+    url = db.Column(db.String, primary_key=True)
+    content = db.Column(db.String)
+
+    def __init__(self, url, content):
+        self.url = '/%s' % url.strip('/')
+        self.content = content
 
 # ----------------------------------------------------------------------------
 
@@ -79,17 +95,23 @@ def uploaded_file(filename):
 @app.route('/_/contents/save', methods=['POST'])
 def save_content():
     content = request.form['content']
-    return jsonify({'msg': 'ok', 'content': content})
+    page = Page('/', content)
+    db.session.merge(page)
+    db.session.commit()
+    return jsonify({'msg': 'ok', 'url': page.url, 'content': page.content})
 
 # ----------------------------------------------------------------------------
 
 @app.route('/')
 def entry():
-    return render_template('app.html')
+    page = Page.query.filter(Page.url == '/').first()
+    return render_template('app.html', page=page)
 
 # ----------------------------------------------------------------------------
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
+    if not os.path.exists(DATABASE_PATH):
+        db.create_all()
     app.run(debug = True)
