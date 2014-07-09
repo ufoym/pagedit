@@ -3,41 +3,25 @@
 <head>
     <title>Pagedit</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/font-awesome.min.css')}}" />
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/redactor.min.css')}}" />
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/custom.css')}}" />
 </head>
 <body>
     <div id="page">
-    <h1>Pagedit</h1>
-    <textarea id="content" name="content">{{page.content}}</textarea>
+        <h1>Pagedit</h1>
+        <button class="btn" onclick="edit();">Edit</button>
+        <button class="btn" onclick="save();">Save</button>
+        <div id="content" name="content">{{page.content|safe}}</div>
     </div>
     <script type="text/javascript" src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/redactor.min.js')}}"></script>
     <script type="text/javascript">
-    if (!RedactorPlugins) var RedactorPlugins = {};
-    RedactorPlugins.save = {
-        init: function ()
-        {
-            this.buttonAdd('save', 'Save', this.saveButton);
-            this.buttonAwesome('save', 'fa-save');
-        },
-        saveButton: function(buttonName, buttonDOM, buttonObj, e)
-        {
-            $.ajax({
-                url: '/_/contents/save?url={{page.url}}',
-                type: 'post',
-                data: 'content=' + $('#content').redactor('get')
-            });
-        }
-    };
-    $(document).ready(
-        function()
+        function edit()
         {
             $('#content').redactor({
-                plugins: ['save'],
                 placeholder: 'Add content...',
                 toolbarFixed: true,
+                focus: true,
                 minHeight: 100,
                 clipboardUploadUrl: '/_/images/paste',
                 imageUpload: '/_/images/add',
@@ -45,7 +29,15 @@
                 imageGetJson: '/_/images'
             });
         }
-    );
+        function save()
+        {
+            $.ajax({
+                url: '/_/contents/save?url={{page.url}}',
+                type: 'post',
+                data: 'content=' + $('#content').redactor('get')
+            });
+            $('#content').redactor('destroy');
+        }
     </script>
 </body>
 </html>
