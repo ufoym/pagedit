@@ -4,21 +4,61 @@
     <title>Pagedit</title>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/redactor.min.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/font-awesome.min.css')}}" />
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/custom.css')}}" />
-</head>
-<body>
-    <div id="page">
-        <h1>Pagedit</h1>
-        <button class="btn" onclick="edit();">Edit</button>
-        <button class="btn" onclick="save();">Save</button>
-        <div id="content" name="content">{{page.content|safe}}</div>
-    </div>
     <script type="text/javascript" src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/redactor.min.js')}}"></script>
     <script type="text/javascript">
+        $(document).ready(
+            function()
+            {
+                $('#content').hover(function() {
+                    if ($('#content').hasClass('content-view')) {
+                        $('#content').addClass('content-view-hover');
+                    }
+                }, function() {
+                    if ($('#content').hasClass('content-view')) {
+                        $('#content').removeClass('content-view-hover');
+                    }
+                });
+                $("#content").click(function() {
+                    if ($('#content').hasClass('content-view')) {
+                        edit();
+                    }
+                });
+            }
+        );
+
+        if (!RedactorPlugins) var RedactorPlugins = {};
+        RedactorPlugins.save = {
+            init: function ()
+            {
+                this.buttonAdd('save', 'Save', this.saveButton);
+                this.buttonAwesome('save', 'fa-save');
+            },
+            saveButton: function(buttonName, buttonDOM, buttonObj, e)
+            {
+                save();
+            }
+        };
+
+        function save()
+        {
+            $('#content').addClass('content-view');
+            $.ajax({
+                url: '/_/contents/save?url={{page.url}}',
+                type: 'post',
+                data: 'content=' + $('#content').redactor('get')
+            });
+            $('#content').redactor('destroy');
+        }
+
         function edit()
         {
+            $('#content').removeClass('content-view');
+            $('#content').removeClass('content-view-hover');
             $('#content').redactor({
+                plugins: ['save'],
                 placeholder: 'Add content...',
                 toolbarFixed: true,
                 focus: true,
@@ -29,15 +69,12 @@
                 imageGetJson: '/_/images'
             });
         }
-        function save()
-        {
-            $.ajax({
-                url: '/_/contents/save?url={{page.url}}',
-                type: 'post',
-                data: 'content=' + $('#content').redactor('get')
-            });
-            $('#content').redactor('destroy');
-        }
     </script>
+</head>
+<body>
+    <div id="page">
+        <h1 class="brand">Pagedit</h1>
+        <div id="content" class="content-view" name="content">{{page.content|safe}}</div>
+    </div>
 </body>
 </html>

@@ -3,8 +3,17 @@
     margin: 50px auto;
 }
 
-#page h1 {
+h1.brand {
     text-align: center;
     font-family: Georgia, Serif;
     font-size: 500%;
+}
+
+.content-view {
+    padding: 8px;
+    min-height: 100px;
+}
+
+.content-view-hover {
+    border: 2px dotted #ccc;
 }
