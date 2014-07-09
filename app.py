@@ -14,7 +14,9 @@ from flask import (
 # ----------------------------------------------------------------------------
 
 UPLOAD_FOLDER = os.path.join('var', 'uploads')
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['txt', 'pdf',
+                          'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+                          'png', 'jpg', 'jpeg', 'gif'])
 CONTENT_TYPE_TO_EXT = {'image/gif':'gif','image/jpeg':'jpg','image/png':'png'}
 
 # ----------------------------------------------------------------------------
@@ -37,7 +39,8 @@ def upload_file():
         filename = '%s.%s' % (time.strftime('%Y%m%d-%H%M%S'), ext)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return jsonify({'msg': 'ok',
-                'filelink': url_for('uploaded_file', filename=filename)})
+                'filelink': url_for('uploaded_file', filename=filename),
+                'filename': filename})
     else:
         return jsonify({'msg': 'error'})
 
