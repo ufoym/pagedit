@@ -76,6 +76,11 @@ def uploaded_list():
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+@app.route('/_/contents/save', methods=['POST'])
+def save_content():
+    content = request.form['content']
+    return jsonify({'msg': 'ok', 'content': content})
+
 # ----------------------------------------------------------------------------
 
 @app.route('/')
